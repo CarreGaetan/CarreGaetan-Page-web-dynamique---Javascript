@@ -1,0 +1,89 @@
+// Définir si l'utilisateur à récupéré le token pour se connecter
+function checkLoginStatus() {
+    const userStatut = localStorage.getItem('token') ? true : false
+    console.log(userStatut)
+    if (userStatut === true) {
+       loginMode(userStatut)
+    } else {
+        logoutMode(userStatut)
+    }
+}
+
+// Changer l'affichage de la page, apparition des éléments du mode édition
+function loginMode () {
+    const loginButton = document.querySelector('.login')
+        loginButton.style.display = 'none';
+
+        const editModeBanner = document.querySelector('.edit-mode-container')
+        console.log(editModeBanner)
+        editModeBanner.style.display = 'flex'
+
+        const editButton = document.querySelector('#openModalLink')
+        editButton.style.display = 'block'
+
+        const galleryFilters = document.querySelector('.categorie-container')
+        galleryFilters.style.display = 'none'
+
+        const logoutButton = document.querySelector('.logout')
+        logoutButton.style.display = 'block'
+        logoutButton.addEventListener('click', () => {
+            localStorage.removeItem('token')
+        })
+}
+
+// Changer l'affichage de la page, disparition des éléments du mode édition
+function logoutMode () {
+    const galleryFilters = document.querySelector('.categorie-container')
+    const navBar = document.querySelector('.nav-container')
+
+    navBar.style.margin = '40px 0 50px 0';
+    if (galleryFilters) {
+        galleryFilters.style.display = 'flex'
+    }
+}
+
+// Envoyer le formulaire de connexion - requête api/login
+function loginSubmit () {
+    const loginForm = document.querySelector('.login-container')
+    if (loginForm) {
+        loginForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            console.log('bouton seConnecter cliqué');
+
+            const userAuth = {
+                email: event.target.querySelector("[name=email]").value,
+                password: event.target.querySelector("[name=password]").value
+            }
+            console.log(userAuth)
+
+            fetch('http://localhost:5678/api/users/login', {
+                method: 'POST', 
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(userAuth)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Authentification échouée')
+                }
+                return response.json();
+            })
+            .then(data => {
+                localStorage.setItem('token', data.token)
+                window.location.href = 'index.html'
+                console.log('token', data.token)
+            })
+            .catch((error) => { 
+                console.error('Error:', error)
+                const errorMessage = document.querySelector('.errorMessage')
+                if (errorMessage) {
+                    errorMessage.textContent = 'Identifiants incorrects';
+                    errorMessage.style.color = 'red'
+                    errorMessage.style.display = 'flex';
+                }
+            })
+        })
+    }
+}
+
+checkLoginStatus()
+loginSubmit ()
