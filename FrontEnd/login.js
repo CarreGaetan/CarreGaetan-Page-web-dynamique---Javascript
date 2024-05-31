@@ -18,8 +18,8 @@ function loginMode () {
         console.log(editModeBanner)
         editModeBanner.style.display = 'flex'
 
-        const editButton = document.querySelector('#openModalLink')
-        editButton.style.display = 'block'
+        const editButton = document.querySelector('.modal-link-container')
+        editButton.style.display = 'flex'
 
         const galleryFilters = document.querySelector('.categorie-container')
         galleryFilters.style.display = 'none'
