@@ -6,6 +6,8 @@ async function initializeGallery() {
         createGalleryElements(works)
         console.log(works)
         createCategoriesButtons(categories, works)
+        localStorage.setItem('works', JSON.stringify(works))
+        localStorage.setItem('categories', JSON.stringify(categories))
     }
 }
 

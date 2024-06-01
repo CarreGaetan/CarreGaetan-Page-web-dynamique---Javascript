@@ -1,23 +1,35 @@
+
+function getLocalStorage () {
+    const works = JSON.parse(localStorage.getItem('works'));
+    const categories = JSON.parse(localStorage.getItem('categories'));
+    if (works && categories) {
+        createGalleryModal(works);
+        createCategoriesElements(categories);
+    }
+    console.log(works)
+    console.log(categories)
+}
+
 // Appeler fetch pour works et categorie dynamiquement
 // Appeler fonctions pour créer les éléments de la gallerie et les boutons de catégories
-async function initializeGallery() {
-        const works = await fetchData('works');
-        const categories = await fetchData('categories');
-        if (works && categories) {
-            createGalleryModal(works);
-            createCategoriesElements(categories);
-        }
-    }
+// async function initializeGallery() {
+//         const works = await fetchData('works');
+//         const categories = await fetchData('categories');
+//         if (works && categories) {
+//             createGalleryModal(works);
+//             createCategoriesElements(categories);
+//         }
+//     }
 
-    // Appeler fetch dynamiquement avec 'endpoint' en paramètre
-    async function fetchData(endpoint) {
-        const response = await fetch(`http://localhost:5678/api/${endpoint}`);
-        if (response.ok) {
-            return await response.json();
-        } else {
-            console.error("Echec lors de la récupération des données de " + endpoint);
-        }
-    }
+//     // Appeler fetch dynamiquement avec 'endpoint' en paramètre
+//     async function fetchData(endpoint) {
+//         const response = await fetch(`http://localhost:5678/api/${endpoint}`);
+//         if (response.ok) {
+//             return await response.json();
+//         } else {
+//             console.error("Echec lors de la récupération des données de " + endpoint);
+//         }
+//     }
 
     // Faire apparaître la modale sur le click
     function openModal() {
@@ -157,7 +169,7 @@ async function initializeGallery() {
                 })
                 .then(data => {
                     console.log('Success:', data);
-                    initializeGallery();
+                    addWorkToLocalStorage (data);
                     form.reset(); // Réinitialiser les champs du formulaire
                     resetPhotoInput ()
                     
@@ -172,6 +184,17 @@ async function initializeGallery() {
                 });
             });
         }
+    }
+
+    function addWorkToLocalStorage (newWork) {
+        // Récupérer les travaux depuis le local storage 
+        let works = JSON.parse(localStorage.getItem('works'));
+
+        // Ajouter le nouveau projet à la liste
+        works.push(newWork);
+
+        // Mettre à jour le local storage avec le nouvelle liste
+        localStorage.setItem('works', JSON.stringify(works))
     }
 
     // Nettoyer le formulaire après qu'un travail ait été posté
@@ -279,11 +302,22 @@ async function initializeGallery() {
                 throw new Error('La suppression a échoué');
             }
             console.log('L\'élément a bien été supprimé');
-            initializeGallery();
+            removeWorkFromLocalStorage (workId);
         })
         .catch(error => {
             console.error('Erreur lors de la suppression', error);
         });
+    }
+
+    function removeWorkFromLocalStorage (workId) {
+        // Récupérer les travaux depuis le local storage 
+        let works = JSON.parse(localStorage.getItem('works'));
+
+        // Filtrer la liste des travaux pour supprimer celui correspondant à workId
+        works = works.filter(work => work.id !== workId);
+
+        // Mettre à jour le localStorage avec la nouvelle liste de travaux
+        localStorage.setItem('works', JSON.stringify(works));
     }
 
     // Masque les éléments sur l'input file et affiche l'image qui vient d'être téléchargée
@@ -315,7 +349,8 @@ async function initializeGallery() {
         });
     }
 
-    initializeGallery();
+    getLocalStorage ();
+    // initializeGallery();
     submitWork();
     openModal();
     closeModal();
