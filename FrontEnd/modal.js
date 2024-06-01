@@ -1,35 +1,14 @@
-
-function getLocalStorage () {
-    const works = JSON.parse(localStorage.getItem('works'));
-    const categories = JSON.parse(localStorage.getItem('categories'));
-    if (works && categories) {
-        createGalleryModal(works);
-        createCategoriesElements(categories);
+    // Récupére les résultats API dans le local storage
+    function getLocalStorage () {
+        const works = JSON.parse(localStorage.getItem('works'));
+        const categories = JSON.parse(localStorage.getItem('categories'));
+        if (works && categories) {
+            createGalleryModal(works);
+            createCategoriesElements(categories);
+        }
+        console.log(works)
+        console.log(categories)
     }
-    console.log(works)
-    console.log(categories)
-}
-
-// Appeler fetch pour works et categorie dynamiquement
-// Appeler fonctions pour créer les éléments de la gallerie et les boutons de catégories
-// async function initializeGallery() {
-//         const works = await fetchData('works');
-//         const categories = await fetchData('categories');
-//         if (works && categories) {
-//             createGalleryModal(works);
-//             createCategoriesElements(categories);
-//         }
-//     }
-
-//     // Appeler fetch dynamiquement avec 'endpoint' en paramètre
-//     async function fetchData(endpoint) {
-//         const response = await fetch(`http://localhost:5678/api/${endpoint}`);
-//         if (response.ok) {
-//             return await response.json();
-//         } else {
-//             console.error("Echec lors de la récupération des données de " + endpoint);
-//         }
-//     }
 
     // Faire apparaître la modale sur le click
     function openModal() {
@@ -103,8 +82,11 @@ function getLocalStorage () {
         choisirUneCategorie.selected = true;
         dropdownCategories.appendChild(choisirUneCategorie);
 
-        for (let i = 0; i < categories.length; i++) {
-            let category = categories[i];
+        // Filtrer les catégories pour exclure "Tous"
+        const filteredCategories = categories.filter(category => category.name !== 'Tous');
+
+        for (let i = 0; i < filteredCategories.length; i++) {
+            let category = filteredCategories[i];
             const categoriesOptions = document.createElement('option');
             categoriesOptions.value = category.id;
             categoriesOptions.textContent = category.name;
@@ -186,6 +168,7 @@ function getLocalStorage () {
         }
     }
 
+    // Ajoute le nouveau projet au local storage
     function addWorkToLocalStorage (newWork) {
         // Récupérer les travaux depuis le local storage 
         let works = JSON.parse(localStorage.getItem('works'));
@@ -309,6 +292,7 @@ function getLocalStorage () {
         });
     }
 
+    // Supprime le projet supprimé du local storage
     function removeWorkFromLocalStorage (workId) {
         // Récupérer les travaux depuis le local storage 
         let works = JSON.parse(localStorage.getItem('works'));
@@ -350,13 +334,33 @@ function getLocalStorage () {
     }
 
     getLocalStorage ();
-    // initializeGallery();
     submitWork();
     openModal();
     closeModal();
     switchWrapper();
     checkInputs();
     displayUploadedImage();
+
+// Appeler fetch pour works et categorie dynamiquement
+// Appeler fonctions pour créer les éléments de la gallerie et les boutons de catégories
+// async function initializeGallery() {
+//         const works = await fetchData('works');
+//         const categories = await fetchData('categories');
+//         if (works && categories) {
+//             createGalleryModal(works);
+//             createCategoriesElements(categories);
+//         }
+//     }
+
+//     // Appeler fetch dynamiquement avec 'endpoint' en paramètre
+//     async function fetchData(endpoint) {
+//         const response = await fetch(`http://localhost:5678/api/${endpoint}`);
+//         if (response.ok) {
+//             return await response.json();
+//         } else {
+//             console.error("Echec lors de la récupération des données de " + endpoint);
+//         }
+//     }
 
 // // Récupérer les données via l'API
 // async function initializeGallery() {
