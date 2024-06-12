@@ -112,11 +112,11 @@
         });
     }
 
-    // AJouter un nouveau projet à la database via un formulaire (api POST)
+  // Ajouter un nouveau projet à la database via un formulaire (api POST)
     function submitWork() {
         const form = document.querySelector('#add-photo-form');
         if (form) {
-            form.addEventListener('submit', (event) => {
+            form.addEventListener('submit', async (event) => {
                 event.preventDefault();
                 showErroMsg()
                 console.log('bouton submit cliqué');
@@ -128,7 +128,7 @@
 
                 const formData = new FormData(form);
 
-                for (const [key, value] of formData.entries()) {
+                for (const [key, value] of formData.entries()) { // logger les values
                     if (value instanceof File) {
                         console.log(`${key}: ${value.name}, ${value.size} bytes, ${value.type}`);
                     } else {
@@ -136,37 +136,38 @@
                     }
                 }
 
-                fetch('http://localhost:5678/api/works', {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${token}`
-                    },
-                    body: formData
-                })
-                .then(response => {
+                try {
+                    const response = await fetch('http://localhost:5678/api/works', {
+                        method: "POST",
+                        headers: {
+                            "Authorization": `Bearer ${token}`
+                        },
+                        body: formData
+                    });
+
                     if (!response.ok) {
                         throw new Error('Échec de l\'envoi des données');
                     }
-                    return response.json();
-                })
-                .then(data => {
+
+                    const data = await response.json();
                     console.log('Success:', data);
-                    addWorkToLocalStorage (data);
+                    const works = addWorkToLocalStorage(data);
                     form.reset(); // Réinitialiser les champs du formulaire
-                    resetPhotoInput ()
-                    
+                    resetPhotoInput()
+
+                    createGalleryModal(works)
+
                     const modalWrapper = document.querySelector('.modal-wrapper');
                     const modalWrapperPhoto = document.querySelector('.modal-wrapper-photo');
                     modalWrapper.style.display = 'flex';
                     modalWrapperPhoto.style.display = 'none';
-
-                })
-                .catch((error) => {
+                } catch (error) {
                     console.error('Error:', error);
-                });
+                }
             });
         }
     }
+
 
     // Ajoute le nouveau projet au local storage
     function addWorkToLocalStorage (newWork) {
@@ -178,6 +179,7 @@
 
         // Mettre à jour le local storage avec le nouvelle liste
         localStorage.setItem('works', JSON.stringify(works))
+        return works
     }
 
     // Nettoyer le formulaire après qu'un travail ait été posté
@@ -264,33 +266,36 @@
         }
     }
 
-    // Supprimer un travail existant de la database (api DELETE)
-    function removeWork(workId) {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            console.error('No token found');
-            return;
-        }
+  // Supprimer un travail existant de la database (api DELETE)
+async function removeWork(workId) {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.error('No token found');
+        return;
+    }
 
-        fetch(`http://localhost:5678/api/works/${workId}`, {
+    try {
+        const response = await fetch(`http://localhost:5678/api/works/${workId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             }
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('La suppression a échoué');
-            }
-            console.log('L\'élément a bien été supprimé');
-            removeWorkFromLocalStorage (workId);
-        })
-        .catch(error => {
-            console.error('Erreur lors de la suppression', error);
         });
+
+        if (!response.ok) {
+            throw new Error('La suppression a échoué');
+        }
+
+        console.log('L\'élément a bien été supprimé');
+        const works = removeWorkFromLocalStorage (workId);
+            
+        createGalleryModal(works)
+    } catch (error) {
+        console.error('Erreur lors de la suppression', error);
     }
+}
 
     // Supprime le projet supprimé du local storage
     function removeWorkFromLocalStorage (workId) {
@@ -302,6 +307,7 @@
 
         // Mettre à jour le localStorage avec la nouvelle liste de travaux
         localStorage.setItem('works', JSON.stringify(works));
+        return works
     }
 
     // Masque les éléments sur l'input file et affiche l'image qui vient d'être téléchargée
@@ -340,6 +346,8 @@
     switchWrapper();
     checkInputs();
     displayUploadedImage();
+
+    // passer la fonction en asynchrone, mettre await
 
 // Appeler fetch pour works et categorie dynamiquement
 // Appeler fonctions pour créer les éléments de la gallerie et les boutons de catégories
