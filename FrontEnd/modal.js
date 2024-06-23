@@ -39,6 +39,28 @@
         });
     }
 
+    // Créer les éléments à partir des données WORKS
+    function createGalleryElements(works) {
+        console.log(works)
+
+        const gallery = document.querySelector('.gallery'); 
+        gallery.innerHTML = '';
+        
+        for (let i = 0; i < works.length; i++) {
+            const work = works[i];
+            const figure = document.createElement('figure');
+            const img = document.createElement('img');
+            const title = document.createElement('figcaption');
+            img.src = work.imageUrl;
+            title.textContent = work.title;
+            figure.id = "work-" + work.id
+            console.log(figure.id)
+            figure.appendChild(img);
+            figure.appendChild(title);
+            gallery.appendChild(figure);
+        };
+    }
+
     // Créer les éléments de la gallerie/ et des boutons pour supprimer un élément
     function createGalleryModal(works) {
         const gallery = document.querySelector('.modal-gallery');
@@ -63,6 +85,7 @@
 
             img.src = work.imageUrl;
             img.style.zIndex = '10';
+            figure.id = "work" + work.id 
 
             figure.appendChild(img);
             figure.appendChild(deleteButton);
@@ -156,6 +179,7 @@
                     resetPhotoInput()
 
                     createGalleryModal(works)
+                    createGalleryElements(works)
 
                     const modalWrapper = document.querySelector('.modal-wrapper');
                     const modalWrapperPhoto = document.querySelector('.modal-wrapper-photo');
@@ -292,6 +316,9 @@ async function removeWork(workId) {
         const works = removeWorkFromLocalStorage (workId);
             
         createGalleryModal(works)
+        const GalleryElement = document.getElementById("work-" + workId)
+        GalleryElement.remove()
+
     } catch (error) {
         console.error('Erreur lors de la suppression', error);
     }

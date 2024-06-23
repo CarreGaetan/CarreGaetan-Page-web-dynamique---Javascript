@@ -34,6 +34,8 @@ function createGalleryElements(works) {
         const title = document.createElement('figcaption');
         img.src = work.imageUrl;
         title.textContent = work.title;
+        figure.id = "work-" + work.id
+        console.log(figure.id)
         figure.appendChild(img);
         figure.appendChild(title);
         gallery.appendChild(figure);
