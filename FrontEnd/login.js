@@ -1,7 +1,8 @@
 // Définir si l'utilisateur à récupéré le token pour se connecter
 function checkLoginStatus() {
+    const token = localStorage.getItem('token');
     const userStatut = localStorage.getItem('token') ? true : false
-    console.log(userStatut)
+
     if (userStatut === true) {
        loginMode(userStatut)
     } else {
@@ -15,7 +16,6 @@ function loginMode () {
         loginButton.style.display = 'none';
 
         const editModeBanner = document.querySelector('.edit-mode-container')
-        console.log(editModeBanner)
         editModeBanner.style.display = 'flex'
 
         const editButton = document.querySelector('.modal-link-container')
@@ -48,13 +48,11 @@ function loginSubmit () {
     if (loginForm) {
         loginForm.addEventListener('submit', (event) => {
             event.preventDefault();
-            console.log('bouton seConnecter cliqué');
 
             const userAuth = {
                 email: event.target.querySelector("[name=email]").value,
                 password: event.target.querySelector("[name=password]").value
             }
-            console.log(userAuth)
 
             fetch('http://localhost:5678/api/users/login', {
                 method: 'POST', 
@@ -70,7 +68,6 @@ function loginSubmit () {
             .then(data => {
                 localStorage.setItem('token', data.token)
                 window.location.href = 'index.html'
-                console.log('token', data.token)
             })
             .catch((error) => { 
                 console.error('Error:', error)

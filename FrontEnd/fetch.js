@@ -1,16 +1,16 @@
-// Récupérer les données via l'API
+// Récupérer les données + créer les éléments de la galerie + stocker données dans le local storage
 async function initializeGallery() {
     const works = await fetchData('works')
     const categories = await fetchData('categories')
     if (works && categories) {
         createGalleryElements(works)
-        console.log(works)
         createCategoriesButtons(categories, works)
         localStorage.setItem('works', JSON.stringify(works))
         localStorage.setItem('categories', JSON.stringify(categories))
     }
 }
 
+// Récupérer les données via l'API
 async function fetchData(endpoint) {
     const response = await fetch(`http://localhost:5678/api/${endpoint}`);
     if (response.ok) {
@@ -22,7 +22,6 @@ async function fetchData(endpoint) {
 
 // Créer les éléments à partir des données du fetchData api/WORKS
 function createGalleryElements(works) {
-    console.log(works)
 
     const gallery = document.querySelector('.gallery'); 
     gallery.innerHTML = '';
@@ -35,7 +34,6 @@ function createGalleryElements(works) {
         img.src = work.imageUrl;
         title.textContent = work.title;
         figure.id = "work-" + work.id
-        console.log(figure.id)
         figure.appendChild(img);
         figure.appendChild(title);
         gallery.appendChild(figure);
@@ -44,7 +42,6 @@ function createGalleryElements(works) {
 
 // Créer les boutons avec les catégories de l'API
 function createCategoriesButtons(categories, works) { 
-    console.log(categories)
     const categoriesButtons = document.querySelector('.categorie-container');
     categoriesButtons.innerHTML = '';
     categories.unshift({'id': 0, 'name': 'Tous'}); // Ajoute 'Tous' aux catégories
@@ -61,10 +58,8 @@ function createCategoriesButtons(categories, works) {
 
 // Filtrer les éléments par nom de catégorie
 function filterWorksByCategory(categoryName = 'Tous', works) {
-    console.log(categoryName)
     const filteredWorks = categoryName === "Tous" ? works : works.filter(work =>
         work.category.name === categoryName );
-        console.log(filteredWorks)
     createGalleryElements(filteredWorks);
 }
 

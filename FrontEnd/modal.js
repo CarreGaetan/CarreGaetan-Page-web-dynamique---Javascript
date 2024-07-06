@@ -6,11 +6,9 @@
             createGalleryModal(works);
             createCategoriesElements(categories);
         }
-        console.log(works)
-        console.log(categories)
     }
 
-    // Fait apparaître la modale sur le click
+    // Faire apparaître la modale sur le click
     function openModal() {
         const openModalLink = document.getElementById('openModalLink');
         openModalLink.addEventListener('click', (e) => {
@@ -39,9 +37,8 @@
         });
     }
 
-    // Créer les éléments de la gallerie à partir des données WORKS
+    // Créer les éléments à partir des données WORKS
     function createGalleryElements(works) {
-        console.log(works)
 
         const gallery = document.querySelector('.gallery'); 
         gallery.innerHTML = '';
@@ -54,14 +51,13 @@
             img.src = work.imageUrl;
             title.textContent = work.title;
             figure.id = "work-" + work.id
-            console.log(figure.id)
             figure.appendChild(img);
             figure.appendChild(title);
             gallery.appendChild(figure);
         };
     }
 
-    // Créer les éléments de la gallerie/ et des boutons pour supprimer un élément dans la modale
+    // Créer les éléments de la gallerie/ et des boutons pour supprimer un élément
     function createGalleryModal(works) {
         const gallery = document.querySelector('.modal-gallery');
         gallery.innerHTML = '';
@@ -142,7 +138,6 @@
             form.addEventListener('submit', async (event) => {
                 event.preventDefault();
                 showErroMsg()
-                console.log('bouton submit cliqué');
                 const token = localStorage.getItem('token');
                 if (!token) {
                     console.error('No token found');
@@ -150,14 +145,6 @@
                 }
 
                 const formData = new FormData(form);
-
-                for (const [key, value] of formData.entries()) { // logger les values
-                    if (value instanceof File) {
-                        console.log(`${key}: ${value.name}, ${value.size} bytes, ${value.type}`);
-                    } else {
-                        console.log(`${key}: ${value}`);
-                    }
-                }
 
                 try {
                     const response = await fetch('http://localhost:5678/api/works', {
@@ -173,7 +160,6 @@
                     }
 
                     const data = await response.json();
-                    console.log('Success:', data);
                     const works = addWorkToLocalStorage(data);
                     form.reset(); // Réinitialiser les champs du formulaire
                     resetPhotoInput()
@@ -233,6 +219,9 @@
                     // Réinitialiser le fichier de l'input
                     const imageInput = document.getElementById('image');
                     imageInput.value = '';
+
+                    // Réattacher l'événement change
+                    displayUploadedImage();
     }
 
     // Vérifier que les formulaires sont bien remplis avant de submit
@@ -312,7 +301,6 @@ async function removeWork(workId) {
             throw new Error('La suppression a échoué');
         }
 
-        console.log('L\'élément a bien été supprimé');
         const works = removeWorkFromLocalStorage (workId);
             
         createGalleryModal(works)
@@ -359,7 +347,6 @@ async function removeWork(workId) {
                 uploadedImage.style.height = '170px';
                 imageContainer.appendChild(uploadedImage);
 
-                console.log(file);
             } else {
                 console.log('Aucun fichier sélectionné');
             }
@@ -373,5 +360,3 @@ async function removeWork(workId) {
     switchWrapper();
     checkInputs();
     displayUploadedImage();
-
-
